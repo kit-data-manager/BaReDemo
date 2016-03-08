@@ -1,0 +1,175 @@
+Introduction
+------------
+This section gives a short introduction about the Basic Repository Demonstrator (BaReDemo). `BaReDemo` serves as showcase for highly customized repository solutions. 
+It allows to manage digital object including Dublin Core metadata. An easy-to-use Web interface allows to manage and to retrieve digital objects in a Google-like 
+simplicity. By default, all digital objects stored in `BaReDemo` are open access, meaning everybody can retrieve all digital objects. For further interaction, e.g.
+modifying metadata, objects can be shared with other registered users by the owner who initially ingested the object. Details on how to use the respository can be found in 
+chapter <<ChapterUsage,Usage>>.
+
+[[BasicRepoInstallation]]
+Installation
+------------
+`BaReDemo` consists of a couple of Docker containers. The <<FigureDocker,figure below>> shows how the three involved containers are linked to each other. 
+
+[[FigureDocker]]
+.Docker setup of `BaReDemo`.
+image::Docker.png[Modules]
+
+[NOTE]
+In order to talk to each other the containers are using socket-based communication. Each container provides different ports that must not be in use. Relevant ports are: 
+5432 (postgresql), 9200/9300 (elasticsearch), 8080/8889 (tomcat). Please stop any service running on one of these ports before you start the Docker containers.
+
+Using Docker allows shipping the entire demonstrator including all services, preconfigured and ready to use, with a small footprint of less than 100 MB. Also the number of prerequisites is rather 
+small and namely Docker and an internet connection. Docker is available for all major Linux distributions, but in principal it should also be possible to setup `BaReDemo` using Docker for Windows or MacOS. 
+
+However, in any case the first step is to install Docker, preferably using the local package manager. In the following Apt of Ubuntu is used: 
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user$ sudo apt-get install docker
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+docker.io is already the newest version.
+user@localhost:/home/user$
+--------------------------------------
+
+Furthermore, it is recommended to build and run the Docker containers as non-root user. In order to be able to use the Docker daemon as non-root user the user must be member of the group 'docker'.
+To add the user to this group call:
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user$ sudo usermod -aG docker user
+user@localhost:/home/user$
+--------------------------------------
+
+In order to be sure that all changes are applied properly it is recommended to reboot the system.
+
+Now, please download and extract the current version of `BaReDemo` to any location, which will be referred below as `$REPO_LOCATION`. In a second step, make all 
+contained scripts executable.
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user$ cd $REPO_LOCATION
+user@localhost:/home/user$ unzip BaReDemo-<Version>.zip
+user@localhost:/home/user$ chmod 755 *.sh
+user@localhost:/home/user$
+--------------------------------------
+
+Afterwards, $REPO_LOCATION has the following content: 
+
+.$PUBREPO_LOCATION after extraction
+-----------------------------------------------------
+ 31/12/69  23:59         <DIR>    elasticsearch   <1>
+ 31/12/69  23:59         <DIR>    manual          <2>
+ 31/12/69  23:59         <DIR>    postgres        <3>
+ 31/12/69  23:59         <DIR>    share           <4>
+ 31/12/69  23:59         <DIR>    tomcat          <5>
+ 31/12/69  23:59           170    build.sh        <6>
+ 31/12/69  23:59           536    initialize.sh   <7>
+ 31/12/69  23:59           414    README.txt      <8> 
+ 31/12/69  23:59            69    rm.sh           <9>
+ 31/12/69  23:59            78    start.sh        <10>
+ 31/12/69  23:59            75    stop.sh         <11>
+-----------------------------------------------------
+
+<1> Dockerfile and configuration for Elasticsearch
+<2> The manual containing installation and usage information
+<3> Dockerfile, schema and sampledata for PostgreSQL
+<4> Shared folders that are associated with Docker volumes used to access data from outside a Docker container
+<5> Dockerfile and configuration for Tomcat including the `BaReDemo` Web Application
+<6> Script used to initially build all three Docker images
+<7> Script used to initialize and start all three Docker containers
+<8> README file containing basic information
+<9> Script used to remove all three Docker containers
+<10> Script to start all three Docker containers after they where stopped
+<11> Script to stop all three Docker containers without removing them
+
+By default, `BaReDemo` is accessible from localhost. For accessing it remotely '$REPO_LOCATION/postgres/sampledata.sql' and 
+'$REPO_LOCATION/tomcat/conf/datamanager.xml' have to be adapted by replacing all occurences of 'localhost' by the hostname or the external IP of the 
+machine running `BaReDemo`. In 'sampledata.sql' there is one occurence in line 47 (http://localhost:8889/webdav/), in 'datamanager.xml' there 
+is also only one relevant occurence in line 9 (http://localhost:8889/BaReDemo).
+
+[NOTE]
+For older Ubuntu distributions the `docker` tool shipped with the distribution is not the one currently needed. The correct Docker tool is available in these Ubuntu software repositories 
+with the name `docker.io`. As also the Docker executable changes, all five provided scripts have to be changed manually replacing calls to `docker` by `docker.io` 
+before `BaReDemo` can be used.
+
+Now `BaReDemo` can be built. Therefor, please use the provided script `build.sh` from within $REPO_LOCATION:
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user$ cd $REPO_LOCATION
+user@localhost:/home/user$ ./build.sh
+Sending build context to Docker daemon  72.7 kB
+Sending build context to Docker daemon 
+Step 0 : FROM ubuntu
+ ---> c3d5614fecc4
+Step 1 : MAINTAINER support@kitdatamanager.net
+[...]
+user@localhost:/home/user$
+--------------------------------------
+
+The build process sets up all three images, deploys the `BaReDemo` Web application into the Tomcat image and submits the database schema and basic database content to the 
+PostgreSQL image. As soon as the build process has finished, all images are available locally and can be used to start the Docker containers for the first time. 
+This has to be done from inside $REPO_LOCATION as the current working directory is obtained and used by the `initialize.sh` script. For starting `BaReDemo` please call:  
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user$ cd $REPO_LOCATION
+user@localhost:/home/user$ ./initialize.sh
+32c6502bb54532b2769ef88ac2c3ff92e89e0627d26c8a905d7f119541180d2f
+c265156e24dd597f5c24def2530149ebae73d95305ad66575916cf92d2d46492
+332d2e5a782d7917bc8cc33ab06e11d728af5760054eeec1758978ec882b4ea8
+user@localhost:/home/user$
+--------------------------------------
+
+The hashes represent the container ids and are different for each call of 'initialize.sh'. 
+Now, `BaReDemo` will start which may take a while. The current status can be checked inside $REPO_LOCATION/share/log/catalina.out after a few seconds 
+and as soon as the message `INFO: Server startup in 12345 ms` appears, `BaReDemo` is accessible via `http://localhost:8889/BaReDemo`.
+
+Just for completeness, before starting to work with `BaReDemo`. Stopping the containers can be achieved using the `stop.sh` script: 
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user$ cd $REPO_LOCATION
+user@localhost:/home/user$ ./stop.sh
+tomcat
+elasticsearch
+database
+user@localhost:/home/user$
+--------------------------------------
+
+Now, all containers are stoppend and `BaReDemo` is not accessible any longer. However, no data (e.g. registered digital objects) has been removed.
+Also the images are still available and the containers can be started again using the `start.sh` script:
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user$ cd $REPO_LOCATION
+user@localhost:/home/user$ ./start.sh
+database
+elasticsearch
+tomcat
+user@localhost:/home/user$
+--------------------------------------
+
+For removing the images and all data from the local system please use the `rm.sh` script after calling `stop.sh`:
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user$ cd $REPO_LOCATION
+user@localhost:/home/user$ ./rm.sh
+tomcat
+elasticsearch
+database
+user@localhost:/home/user$
+--------------------------------------
+
+After this call, all data created by `BaReDemo` is removed. Only the data written to the outside of the containers (everything stored in $REPO_LOCATION/share) will
+still exist. In order to start a new instance of `BaReDemo`, `initialize.sh` has to be called again.
+
+[NOTE]
+The only valid execution workflow for the scripts is build.sh (typically only once) > initialize.sh > stop.sh > start.sh or rm.sh > intialize.sh > ... 
+Calling them in a different order will result in an error message. In case of an error you can reset everything by calling `stop.sh` followed by `rm.sh` 
+ignoring all error messages that may arise. Afterwards, all containers and images are removed and `BaReDemo` can be started again using 
+`initialize.sh`.

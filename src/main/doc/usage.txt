@@ -1,0 +1,112 @@
+
+[ChapterUsage]
+Usage
+-----
+On the following pages the usage of `BaReDemo` is decribed together with some remarks on how the single steps are realized using features of KIT Data Manager.
+After installing `BaReDemo` as described in section <<BasicRepoInstallation, Installation>>, you can use your Web browser to access the application via 
+`http://localhost:8889/BaReDemo` and you'll see: 
+
+.Frontend view of `BaReDemo` used to query for digital objects.
+image::search.png[Frontend]
+
+Adding a Digital Object
+~~~~~~~~~~~~~~~~~~~~~~~
+For adding new digital objects the standard generic repository client which available at the KIT Data Manager Web page can be used. You'll find the appropriate download
+section link:http://kitdatamanager.net/index.php/nav-kit-dm-resources/nav-kit-dm-resources-others[here]. The download package also contains information on how
+to install and setup the generic repository client. During the installation you'll be asked for the following settings, which are pre-configured for `BaReDemo`:
+
+[cols="m,n", options="header"]
+|================================================================================================================================================
+|Setting|Value
+|[red]#RestServer#|[red]#http://localhost:8889/BaReDemo#
+|[red]#accessKey#|[red]#admin#
+|[red]#accessSecret#|[red]#dama14#
+|[red]#userId#|[red]#admin#
+|group|USERS
+|AccessPoint|0000-0000-0000-0000
+|WebDav username|webdav
+|WebDav password|webdav
+|================================================================================================================================================
+
+During the first setup also a Study and an Investigation, which are both part of the basic KIT Data Manager metadata structure, are created. The values marked in red
+in the table above depend on the user performing the ingest. For the WebDav access also different users can be created, but this has to be done on the level of
+the Tomcat container and is not connected in any way to the repository system.
+
+[NOTE]
+To register more users and to obtain their according credentials, please refer to the administration backend
+which can be accessed via `http://localhost:8889/BaReDemo/admin` using the default login information dama@kit.edu/dama14. 
+
+After ingesting a new digital object using the command line client, the newly created object is in a so called pre-ingest state, meaning that the base metadata is
+registered, that the data is available in a prepared cache and that the object is ready for the final ingest into the repository storage. Typically, this task is 
+executed asychronously by a Cron Job performing the data ingest. However, as the demonstrator is running in a Docker container, there is no Cron Daemon available.
+Therefore, this step has to be triggered manually by the person who perfomed the ingest. In order to do this, open `http://localhost:8889/BaReDemo` and login, e.g. 
+with email `dama@kit.edu` and password `dama14` if you performed the ingest as the default user. Then type `INGEST_PENDING` into the search field and press return 
+or the search button next to the input field.
+
+The result list should show one entry named similar to `DigitalObject_2015_09_02T15_16` with a button called `Ingest` on the right hand side. By clicking this button
+the ingest will be triggered, which includes:
+
+--
+- Zipping of all uploaded data for easier, web-based download
+- Ingest of the cached data into the repository storage and registration of the data organization
+- Assign read permissions to the default group `USERS` and allow to apply single-user permissions (so called `grants`) for sharing the object with others
+- Transform the base metadata of the digital object into a Dublin Core representation and register it at the local elasticseach index 
+-- 
+
+Afterwards, the object is retrievable by everybody and the associated data can be downloaded. Furthermore, the owner of the object can share it with other registered users,
+some metadata fields can be changed by the owner and users the object is shared with, and the object can be `favored` by the owner by clicking the star button. 
+This allows to search only for objects tagged as `favorite` by entering the term `FAVORITES` into the search field, which will be explained in the next section.
+
+
+Searching for Digital Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Now that we have at least one digital object registered we can search for it using the Web UI of `BaReDemo`. The input field on top of the Web UI provides a fulltext search 
+for Dublin Core metadata obtained from the digital objects within the repository. There are three different types of search queries:
+
+--
+- Search for pending ingests
+- Search for favored objects (marked by the owner with the yellow star)
+- Fulltext search using elasticsearch
+--
+
+Query 1 can be executed by typing `INGEST_PENDING` into the search field as described in the previous chapter. Query 2 is executed by typing `FAVORITES` into the 
+search field. This will query the metadata for objects tagged by the `favorite` object type and returns the result. The last query type is directly forwarded to
+the local elasticsearch index, therefore the query syntax of elasticsearch can be used. Some examples are listed below. Also keep in mind, that all queries are 
+case insensitive.
+
+[cols="m,n", options="header"]
+|================================================================================================================================================
+|Query|What will be found?
+|*|All objects.
+|Object 1|All objects having the terms 'Object' or '1' in their Dublin Core metadata.
+|"Object 1"|All objects having the phrase 'Object 1' in their Dublin Core metadata.
+|*ject|All objects having a sub-term ending with 'ject' in their Dublin Core metadata.
+|Obj*|All objects having a sub-term starting with 'Obj' in their Dublin Core metadata.
+|*jec*|All objects having a sub-term containing 'jec' in their Dublin Core metadata.
+|Obj* AND *ect|All objects having a sub-term starting with 'Obj' and ending with 'ect' in their Dublin Core metadata.
+|Obj* OR *ect|All objects having a sub-term starting with 'Obj' or ending with 'ect' in their Dublin Core metadata.
+|================================================================================================================================================
+
+Please refer to the link:https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax[elasticsearch documentation] for more possibilities.
+
+Finally, the search term can also be provided in the URL of `BaReDemo`. Therefor, just append '/search&q=' followed by the URL-encoded search term, e.g. 
+
+http://localhost:8889/BaReDemo/search?q=Object
+
+Next Steps
+~~~~~~~~~~
+After understanding how `BaReDemo` works and what are its features, the question is how to overcome potential limitations and how to implement use case- or community-specific extensions.
+In the first place, a more user friendly and feature-rich user interface might be required. The existing user interface provide basic search and management capabilities, however, enhanced 
+features like faceted search or custom tags realized as object types similar to the `favorite` type, might be helpful for the user.
+
+Also, an extension of the ingest workflow, e.g. by adding new KIT Data Manager staging processors for extracting and publishing additional metadata during the ingest are imaginable.
+On information how to achieve this, please refer to the link:http://kitdatamanager.net/dama/manual/index.html[manual of KIT Data Manager] and to the source code of `BaReDemo` available on GitHub for 
+examples. 
+
+If new access points providing repository access using other protocols than WebDav are needed they can be configured using the admin backend of `BaReDemo`. Please refer to the WebDav example 
+and the KIT Data Manager manual on how to setup new access points. In this scope, also the integration of an external source of users and groups, e.g. an LDAP server, can be reasonable in 
+order to have a centrally managed database of users that can be used by the repository system as well as by data transfer services. However, to achieve this a synchronization of the external 
+user/group information and the KIT Data Manager users and groups are necessary, which has to be implemented.
+
+Finally, management and preservation tasks might applied to the data in the repository system if a sufficient amount of metadata was obtained in beforehand. However, as there are no generic 
+services available yet, such tasks have to be implemented in a custom way outside the repository system for the time being.

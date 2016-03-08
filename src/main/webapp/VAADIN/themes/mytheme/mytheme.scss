@@ -1,0 +1,85 @@
+/* Import the reindeer theme. */
+/* This only allows us to use the mixins defined in it and does not add any styles by itself. */
+@import "../reindeer/reindeer.scss";
+@import "admin.scss";
+
+
+/* This contains all of your theme. */
+/* If somebody wants to extend the theme she will include this mixin. */
+@mixin mytheme {
+  /* Include all the styles from the reindeer theme */
+  @include reindeer;
+  @include admin;
+  /* Insert your theme rules here */
+
+  .clickable{
+    cursor: pointer; 
+  }
+
+  .v-label-basic{
+    margin-left:3px;
+    text-align:center;
+  }
+  .v-label-basic_title{
+    margin-left:3px;
+    text-align:left;
+    font-weight:bold;
+    font-size:14px;
+  }
+
+  .v-textfield-searchField{
+    font-size:20px!important;
+    background:#EEEEEE;
+  }
+ .v-label-bigtext{
+    font-size:24px!important;
+  }
+
+  .v-label-abstract{
+    margin-left:3px;
+    margin-right:3px;
+    text-align:left;
+  }
+
+  .v-horizontallayout-doi{
+    background-color: #EEEEEE;
+    border: 1px outset #EEEEEE;
+  }
+
+  .v-gridlayout-basic{
+    background-color: #FFFFFF;
+    border: 1px dotted #DDDDDD;
+    text-align:center;
+  }
+	 .v-label-horizontal-line{
+        background: url("img/horizontal-line.png") repeat-x!important;
+        height: 2px!important;
+    }
+	
+	.v-label-vertical-line{
+        background: url("img/vertical-line.png") repeat-y!important;
+        width: 2px!important;
+    }
+	
+  .v-gridlayout-paper{
+    /*background-image:url("../mytheme/img/background.png");*/
+    /*background-repeat: repeat;*/
+    border: 1px dotted #DDDDDD;
+  }
+
+ .v-loading-indicator,  
+ .v-loading-indicator-delay,  
+ .v-loading-indicator-wait {  
+   width: 200%;
+   height: 200%;
+   margin: 0;
+   background-position: 50%;
+   background-image: url("../mytheme/img/48x48/book_blue_search.gif");
+   background-color: rgba(255, 255, 255, 0.5);
+   opacity: .8;
+   -ms-filter: alpha(opacity=80);
+   filter: alpha(opacity=80);
+   background-repeat: no-repeat; 
+   background-attachment: fixed;  
+ }  
+}

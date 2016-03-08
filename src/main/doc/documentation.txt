@@ -1,0 +1,22 @@
+Basic Repository Demonstrator Manual
+====================================
+Contact <support@kitdatamanager.net>
+:toc: left
+:iconsdir: ./icons
+:icons: font
+:max-width: 90em
+:author:    KIT Data Manager Dev Team
+:email:     support@kitdatamanager.net
+:revdate:   October 20, 2015
+:revnumber: 1.0.0
+:website: http://kitdatamanager.net/index.php/nav-kit-dm-case-studies/nav-kit-dm-studies-basic
+
+About this documentation
+------------------------
+This documentation describes step by step how to use the Basic Repository Demonstrator (BaReDemo), which is a demonstrator for KIT Data Manager. The goal is to give examples how KIT Data Manager could be 
+used to build up repository systems for complex digital objects. Therefor, additional information boxes describe roughly what happens in the background. For more details about these
+background processes and how to implement or customize them, please refer to the KIT Data Manager manual. 
+
+include::introduction.txt[]
+
+include::usage.txt[]

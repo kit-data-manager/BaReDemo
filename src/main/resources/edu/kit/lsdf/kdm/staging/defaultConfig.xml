@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   ******************************************************************
+***                    defaultConfig.xml                              ***
+*************************************************************************
+***   This file contains the configuration for the staging module of  *** 
+      KIT Data Manager.									 		      ***
+*************************************************************************-->
+<stagingConfig>   
+  <adapters>
+    <dataOrganizationAdapter class="edu.kit.lsdf.kdm.staging.adapters.DefaultDataOrganizationServiceAdapter" target="LOCAL"/>        
+    <ingestInformationServiceAdapter class="edu.kit.lsdf.kdm.staging.adapters.DefaultIngestInformationServiceAdapter" target="LOCAL"/>
+    <downloadInformationServiceAdapter class="edu.kit.lsdf.kdm.staging.adapters.DefaultDownloadInformationServiceAdapter" target="LOCAL"/>
+    <storageVirtualizationAdapter class="edu.kit.lsdf.kdm.staging.adapters.DefaultStorageVirtualizationAdapter" target="LOCAL">
+      <archiveUrl>${staging.archive.url}</archiveUrl>
+      <pathPattern>${staging.archive.path.pattern}</pathPattern>
+    </storageVirtualizationAdapter>
+  </adapters>
+    
+  <remoteAccess>
+    <restUrl>${staging.rest.url}</restUrl>
+  </remoteAccess>
+       
+  <mailNotifier>
+    <mailServer>${staging.notification.mail.server}</mailServer>
+    <sender>${staging.notification.mail.sender}</sender>
+  </mailNotifier>
+    
+</stagingConfig>
