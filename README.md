@@ -7,17 +7,16 @@ simplicity. For more information on components of the BaReDemo and how to use it
 
 In order to build the BaReDemo you'll need:
 
-* Java SE Development Kit 7 or higher
-* Apache Maven 3
-* Build of the [KIT Data Manager 1.2 base](https://github.com/kit-data-manager/base) project
+* Java SE Development Kit 8 or higher
+* Apache Maven 3.3+
+* Build of the [KIT Data Manager 1.3 base](https://github.com/kit-data-manager/base) project
 
-Before building KIT Data Manager 1.2 you have to change the file `UserInterface/AdminUI/pom.xml` by changing the packaging type from `war` to `jar`.
+Before building KIT Data Manager 1.3 you have to change the file `UserInterface/AdminUI/pom.xml` by changing the packaging type from `war` to `jar`.
 
-After building KIT Data Manager 1.2 base and obtaining the sources of the BaReDemo, change to the folder where the sources are located, e.g. /home/user/BaReDemo. Edit the file `makeDist.sh` and set JAVA_HOME and MAVEN_HOME according to your local installation. Afterwars, just call:
+After building KIT Data Manager 1.3 base and obtaining the sources of the BaReDemo, change to the folder where the sources are located, e.g. /home/user/BaReDemo. Edit the file `makeDist.sh` and set JAVA_HOME and MAVEN_HOME according to your local installation. Afterwars, just call:
 
 ```
-user@localhost:/home/user/BaReDemo/$ chmod +x makeDist.sh
-user@localhost:/home/user/BaReDemo/$ ./makeDist.sh
+user@localhost:/home/user/BaReDemo/$ sh ./makeDist.sh
 Building distribution for release BaReDemo-1.0-SNAPSHOT and application BaReDemo.war
 Executing clean install
 [...]
