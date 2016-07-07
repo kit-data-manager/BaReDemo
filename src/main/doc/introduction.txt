@@ -9,7 +9,7 @@ chapter <<ChapterUsage,Usage>>.
 [[BasicRepoInstallation]]
 Installation
 ------------
-`BaReDemo` consists of a couple of Docker containers. The <<FigureDocker,figure below>> shows how the three involved containers are linked to each other. 
+A default `BaReDemo` installation consists of a couple of Docker containers. The <<FigureDocker,figure below>> shows how the three involved containers are linked to each other. 
 
 [[FigureDocker]]
 .Docker setup of `BaReDemo`.
@@ -22,7 +22,10 @@ In order to talk to each other the containers are using socket-based communicati
 Using Docker allows shipping the entire demonstrator including all services, preconfigured and ready to use, with a small footprint of less than 100 MB. Also the number of prerequisites is rather 
 small and namely Docker and an internet connection. Docker is available for all major Linux distributions, but in principal it should also be possible to setup `BaReDemo` using Docker for Windows or MacOS. 
 
-However, in any case the first step is to install Docker, preferably using the local package manager. In the following Apt of Ubuntu is used: 
+On the other hand it is also possible to install `BaReDemo` outside of Docker using external Tomcat, database and search index installations. How to achieve this is described in chapter 
+<<EnhancedRepoInstallation,Enhanced Installation>>.
+
+For the basic installation the first step is to install Docker, preferably using the local package manager. In the following Apt of Ubuntu is used: 
 
 [source,sh]
 --------------------------------------
@@ -95,7 +98,7 @@ For older Ubuntu distributions the `docker` tool shipped with the distribution i
 with the name `docker.io`. As also the Docker executable changes, all five provided scripts have to be changed manually replacing calls to `docker` by `docker.io` 
 before `BaReDemo` can be used.
 
-Now `BaReDemo` can be built. Therefor, please use the provided script `build.sh` from within $REPO_LOCATION:
+Now the Docker images of `BaReDemo` can be built. Therefor, please use the provided script `build.sh` from within $REPO_LOCATION:
 
 [source,sh]
 --------------------------------------
@@ -169,7 +172,111 @@ After this call, all data created by `BaReDemo` is removed. Only the data writte
 still exist. In order to start a new instance of `BaReDemo`, `initialize.sh` has to be called again.
 
 [NOTE]
-The only valid execution workflow for the scripts is build.sh (typically only once) > initialize.sh > stop.sh > start.sh or rm.sh > intialize.sh > ... 
+The only valid execution order for the scripts is build.sh (typically only once) > initialize.sh > stop.sh > start.sh or rm.sh > intialize.sh > ... 
 Calling them in a different order will result in an error message. In case of an error you can reset everything by calling `stop.sh` followed by `rm.sh` 
 ignoring all error messages that may arise. Afterwards, all containers and images are removed and `BaReDemo` can be started again using 
 `initialize.sh`.
+
+[[EnhancedRepoInstallation]]
+Enhanced Installation
+-----------------------
+For the enhanced installation of `BaReDemo` it is recommended to build the demonstrator from source. The source code is available at GitHub: https://github.com/kit-data-manager/basic-repository-demonstrator
+
+[NOTE]
+Before you can build `BaReDemo` you have to build the KIT Data Manager base modules available at https://github.com/kit-data-manager/base . Please refer to the README of the base repository for build instructions.
+
+Clone the repository to any local folder, e.g. to `/home/user/BaReDemo/`, and start with modifying the file `makeDist.sh`, setting JAVA_HOME and MAVEN_HOME according to your local installations. 
+Furthermore, set the value of `DEPLOY_TARGET` from `docker` to `release` in order to avoid mixing Docker settings and your custom settings.
+
+Now, the build process can be started by calling:
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user/BaReDemo/$ sh ./makeDist.sh
+Building distribution for release BaReDemo-1.0-SNAPSHOT and application BaReDemo.war
+Executing clean install
+[...]
+user@localhost:/home/user/BaReDemo/$
+--------------------------------------
+
+Afterwards, an elasticsearch instance should be installed and configured first. The only properties relevant for `BaReDemo` are the hostname of the elasticsearch host, typically `localhost`, 
+and the name of the elasticsearch cluster, which is configured in a file named `elasticsearch.yml`, let's assume `KITDataManager@localhost`. In the next step the database has to be configured. 
+It is recommended to install a PostgreSQL server 9.1+
+
+Afterwards, a password should be set for the database user that was created during installation.
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user/BaReDemo/$ sudo -u postgres psql postgres
+psql (9.1.13)
+Type "help" for help.
+
+postgres=#\password postgres
+--------------------------------------
+
+Now set a password for the database user `postgres` and keep it in mind for later configuration steps. Now the KIT Data Manager database can be created. 
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user/BaReDemo/$ sudo -u postgres createdb datamanager
+user@localhost:/home/user/BaReDemo/$ 
+--------------------------------------
+
+A database named `datamanager` has been created and can be set up. For this purpose, a file named `Docker/postgres/schema.sql` is provided as part of the `BaReDemo` source code. 
+Apply the SQL statements in this file to the database by the following command:
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user/BaReDemo/$ sudo -u postgres psql -U postgres -d datamanager -f ./Docker/postgres/schema.sql
+SET
+[...]
+user@localhost:/home/user/BaReDemo/$ 
+--------------------------------------
+
+Finally, the database has to be filled with basic sample data in order to access `BaReDemo` later for the first time. This basic sample data is stored in the file 
+`Docker/postgres/sampledata.sql`. Before you continue you may modify this file according to your needs. What you should definitely change is the value `http://localhost:8889/webdav/` to fit the hostname and port of the 
+Tomcat instance in which `BaReDemo` is running. Afterwards, add all data stored in this file to the database by the following command: 
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user/BaReDemo/$ sudo -u postgres psql -U postgres -d datamanager -f ./Docker/postgres/sampledata.sql
+SET
+[...]
+user@localhost:/home/user/BaReDemo/$ 
+--------------------------------------
+
+In the final step, the Tomcat instance has to be prepared. Install Tomcat if you have no local installation, yet. Afterwards, copy the following files and directories, whereas $CATALINA_HOME is the installation directory of Tomcat:
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user/BaReDemo/$ cp -r assembly/BaReDemo.war $CATALINA_HOME/webapps
+user@localhost:/home/user/BaReDemo/$ cp -r Docker/tomcat/conf/webdav $CATALINA_HOME/webapps
+user@localhost:/home/user/BaReDemo/$ cp Docker/tomcat/conf/tomcat-users.xml $CATALINA_HOME/conf
+user@localhost:/home/user/BaReDemo/$ 
+--------------------------------------
+
+As soon as the `BaReDemo` application is deployed you have to configure `BaReDemo`. Therefor, open the file `$CATALINA_HOME/webapps/BaReDemo/WEB-INF/classes/datamanager.xml` 
+with a text editor of your choice and assign/adapt the following properties:
+
+[cols="m,n", options="header"]
+|============================================================================================================================
+|Property|Description/Example
+|general.baseUrl|The base URL pointing to `BaReDemo`, e.g. http://localhost:8080/BaReDemo
+|elasticsearch.cluster|The name of the elasticsearch cluster used by BaReDemo, e.g. KITDataManager@localhost
+|storageVirtualizationAdapter.archiveUrl|The location where the repository stores ingested data. Must be a an existing, local directory writable by the tomcat user, e.g. file:///home/tomcat/baredemo/archive/
+|scheduler.jobStoreConnectionString|The connection string for the database, e.g. jdbc:postgresql://localhost:5432/datamanager
+|scheduler.jobStoreUser|The user name for the database, e.g. postgres
+|scheduler.jobStorePassword|The user password for the database, e.g. postgres
+|============================================================================================================================
+
+Finally, restart the Tomcat server:
+
+[source,sh]
+--------------------------------------
+user@localhost:/home/user/BaReDemo/$ sudo service tomcat7 restart
+user@localhost:/home/user/BaReDemo/$
+-------------------------------------- 
+
+Now, you should be able to access `BaReDemo` by browsing to http://localhost:8080/BaReDemo
+The AdminUI is available at http://localhost:8080/BaReDemo/admin , the default login is dama@kit.edu / dama14, and you can check if everything is configured properly, 
+e.g. staging access point and staging processors, before ingesting the first digital object.

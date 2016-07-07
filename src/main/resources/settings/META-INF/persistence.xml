@@ -27,10 +27,10 @@
         <class>edu.kit.dama.authorization.entities.impl.SecurableResource</class>
         <shared-cache-mode>NONE</shared-cache-mode>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/jejkal"/>
-            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.user" value="jejkal"/>
-            <property name="javax.persistence.jdbc.password" value=""/>
+           <property name="javax.persistence.jdbc.url" value="${persistence.connection.string}"/>
+            <property name="javax.persistence.jdbc.driver" value="${persistence.connection.driver}"/>      
+            <property name="javax.persistence.jdbc.user" value="${persistence.database.user}"/>
+            <property name="javax.persistence.jdbc.password" value="${persistence.database.user.password}"/>
             <property name="eclipselink.logging.level" value="SEVERE"/>
             <property name="eclipselink.ddl-generation" value="create-tables"/>
             <property name="eclipselink.canonicalmodel.subpackage" value="release"/>
@@ -47,10 +47,10 @@
         <class>edu.kit.dama.mdm.dataorganization.impl.jpa.DataOrganizationNode</class>
         <class>edu.kit.dama.mdm.dataorganization.impl.jpa.FileNode</class>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/jejkal"/>
-            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.user" value="jejkal"/>
-            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="javax.persistence.jdbc.url" value="${persistence.connection.string}"/>
+            <property name="javax.persistence.jdbc.driver" value="${persistence.connection.driver}"/>      
+            <property name="javax.persistence.jdbc.user" value="${persistence.database.user}"/>
+            <property name="javax.persistence.jdbc.password" value="${persistence.database.user.password}"/>
             <property name="eclipselink.logging.level" value="SEVERE"/>
             <property name="eclipselink.ddl-generation" value="create-tables"/>
             <shared-cache-mode>NONE</shared-cache-mode>
@@ -102,10 +102,10 @@
         <class>edu.kit.dama.mdm.admin.UserProperty</class>
         <class>edu.kit.dama.mdm.admin.UserPropertyCollection</class>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/jejkal"/>
-            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>      
-            <property name="javax.persistence.jdbc.user" value="jejkal"/>
-            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="javax.persistence.jdbc.url" value="${persistence.connection.string}"/>
+            <property name="javax.persistence.jdbc.driver" value="${persistence.connection.driver}"/>      
+            <property name="javax.persistence.jdbc.user" value="${persistence.database.user}"/>
+            <property name="javax.persistence.jdbc.password" value="${persistence.database.user.password}"/>
             <property name="eclipselink.ddl-generation" value="create-tables"/>
             <property name="eclipselink.logging.level" value="SEVERE"/>
             <shared-cache-mode>NONE</shared-cache-mode>
@@ -124,10 +124,10 @@
         <class>edu.kit.dama.staging.entities.StagingAccessPointConfiguration</class>
         <class>edu.kit.dama.staging.entities.StagingProcessor</class>   
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/jejkal"/>
-            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.user" value="jejkal"/>
-            <property name="javax.persistence.jdbc.password" value=""/>
+          <property name="javax.persistence.jdbc.url" value="${persistence.connection.string}"/>
+            <property name="javax.persistence.jdbc.driver" value="${persistence.connection.driver}"/>      
+            <property name="javax.persistence.jdbc.user" value="${persistence.database.user}"/>
+            <property name="javax.persistence.jdbc.password" value="${persistence.database.user.password}"/>
             <property name="eclipselink.logging.level" value="SEVERE"/>
             <property name="eclipselink.ddl-generation" value="create-tables"/>
             <shared-cache-mode>NONE</shared-cache-mode>

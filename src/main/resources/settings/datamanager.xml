@@ -138,9 +138,53 @@ Staging-related settings.
   <maxDownloadLifetime>604800</maxDownloadLifetime>
 </staging>
 
+ <!--
+ DataOrganization-related settings.
+ -->
+<!--
+ <dataOrganization>
+     <dataOrganizerAdapter class="edu.kit.dama.util.DataOrganizerImpl">  
+         <neo4jUrl>http://localhost:7474</neo4jUrl>
+         <neo4jUser>neo4j</neo4jUser>
+         <neo4jPassword>test</neo4jPassword>
+     </dataOrganizerAdapter>
+ </dataOrganization>
+-->
+
 <scheduler>
-  <configFile>quartz_scheduler.properties</configFile>
+  <!--Connection information for the JobStore used to hold information about scheduled jobs. Typically, the same information also used
+      in the persistence.xml can be applied here in order to keep everything together in one place.-->
+  <jobStoreConnectionDriver>${persistence.connection.driver}</jobStoreConnectionDriver>
+  <jobStoreConnectionString>${persistence.connection.string}</jobStoreConnectionString>
+  <jobStoreUser>${persistence.database.user}</jobStoreUser>
+  <jobStorePassword>${persistence.database.user.password}</jobStorePassword>
+  <!--Wait for running tasks if the scheduler is shutting down, e.g. due to shutting down the application server. default: true-->
   <waitOnShutdown>true</waitOnShutdown>
+  <!--Delay in seconds before the scheduler starts the execution of tasks. This delay is useful as services needed to perform tasks
+      may not be running, yet, when the scheduler starts. The default value is 5 seconds.-->
   <startDelaySeconds>5</startDelaySeconds>
+   <!--Add default schedules during the first startup of the scheduler. These schedules are executing transfer finalization 
+       (ingest/download) every 60/30 seconds. The default value is true.-->
+  <addDefaultSchedules>true</addDefaultSchedules>
 </scheduler>
+
+<!--dataOrganization>
+<dataOrganizerAdapter class="edu.kit.dama.util.DataOrganizerImpl">  
+</dataOrganizerAdapter>
+</dataOrganization-->
+
+<metadataManagement>
+        <transitionTypes>
+                <NONE>
+                        <handlerClass>edu.kit.dama.mdm.tools.NullTransitionTypeHandler</handlerClass>
+                </NONE>
+                <DATAWORKFLOW>
+                        <handlerClass>edu.kit.dama.mdm.dataworkflow.tools.DataWorkflowTransitionTypeHandler</handlerClass>
+                </DATAWORKFLOW>
+                <ELASTICSEARCH>
+                        <handlerClass>edu.kit.dama.mdm.content.util.ElasticsearchTransitionTypeHandler</handlerClass>
+                </ELASTICSEARCH>
+        </transitionTypes>
+</metadataManagement>
+
 </config>
