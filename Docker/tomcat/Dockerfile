@@ -1,7 +1,7 @@
 FROM ubuntu
 MAINTAINER support@kitdatamanager.net
 
-# Install JDK 7 and Tomcat 7. --no-install-recommends is a workaround to avoid installing fuse together with JDK 7 
+# Install JDK 8 and Tomcat 7. --no-install-recommends is a workaround to avoid installing fuse together with JDK 7 
 # as this causes an error during installation.
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends openjdk-8-jdk tomcat7
